@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon longPolling.js",
+    "start": "nodemon eventSource.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

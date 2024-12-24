@@ -8,7 +8,7 @@ const emitter = new events.EventEmitter();
 const app = express();
 
 app.use(cors());
-app.use(express.json())
+app.use(express.json());
 
 app.post("/post-message", (req, res) => {
    const message = req.body;
@@ -16,9 +16,14 @@ app.post("/post-message", (req, res) => {
    res.status(200);
 });
 
-app.get("/get-messages", (req, res) => {
-   emitter.once("newMessage", (message) => {
-      res.json(message);
+app.get("/connect", (req, res) => {
+   res.writeHead(200, {
+      Connection: "keep-alive",
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+   });
+   emitter.on("newMessage", (message) => {
+      res.write(`data: ${JSON.stringify(message)} \n\n`);
    });
 });
 

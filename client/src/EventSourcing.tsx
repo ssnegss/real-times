@@ -6,26 +6,24 @@ type TMessage = {
    id: number;
 };
 
-export const LongPolling = () => {
+export const EventSourcing = () => {
    const [messages, setMessages] = useState<Array<TMessage>>([]);
    const [value, setValue] = useState<string>("");
 
    useEffect(() => {
-      subscribe();
-   }, []);
+      const eventSource = new EventSource("http://localhost:5000/connect");
 
-   const subscribe = async () => {
-      try {
-         const { data } = await axios.get("http://localhost:5000/get-messages");
-         setMessages((prev) => [data, ...prev]);
-         await subscribe();
-      } catch (e) {
-         setTimeout(() => {
-            subscribe();
-         }, 500);
-         console.error(e);
-      }
-   };
+      eventSource.onmessage = (e) => {
+         console.log(e.data);
+         const message = JSON.parse(e.data);
+         setMessages((prev) => [message, ...prev]);
+      };
+
+      return () => {
+         eventSource.close();
+         console.log("EventSource closed");
+      };
+   }, []);
 
    const sendMessage = async () => {
       await axios.post("http://localhost:5000/post-message", {
